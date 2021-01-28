@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html class="no-js">
+
+<head>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+</head>
+<body>
+    
+<table id="dataTablerig" style="width:100%">
+    <tbody style="width: 100%; display: table;">
+    </tbody>
+</table>
+
+<script src="https://www.gstatic.com/firebasejs/7.22.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.22.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.22.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.22.1/firebase-firestore.js"></script>
+
+
+<script>
+
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "********************************",
+        authDomain: "*********.firebaseapp.com",
+        databaseURL: "https://*******.com",
+        projectId: "***********",
+        storageBucket: "*******.appspot.com",
+        messagingSenderId: "***********************",
+        appId: "***************************",
+        measurementId: "*****************"
+    };
+    // Firebase Initialization
+    firebase.initializeApp(firebaseConfig);
+
+    // Declare Database as a variable
+    var db = firebase.firestore();
+
+    
+    firebase.auth().onAuthStateChanged(function (user) {
+        // Firebase Code for fetching items from Firebase
+    db.collection("Hire/Jobs/Posted").get().then(function (querySnapshot) {
+        querySnapshot.forEach(function (doc) {
+             var dash = document.getElementById("progress");
+            dash.style.display = "none";
+            if (doc.get("title") != null  && doc.data().status == "not_accepted") {
+            var dataSet = JSON.stringify(doc.data())
+            console.log(dataSet);bidder_no = bidder_no + 1;
+            var eee = doc.data().posted
+            const dateInMillis = eee.seconds * 1000
+            var date = new Date(dateInMillis).toDateString()
+
+            // Loop through details to table rows
+            if(doc.get("typee") != null && doc.get("to") != null && doc.data().typee == "private" && doc.data().to == user.uid){
+                 var new_row =
+                    '<tr style="width:100%"><td style="width:100%" data-id=' + doc.id + ' data-subject="' + doc.data().title + '" data-name="' + doc.data().name + '" data-attachment1=' + doc.data().attachment1 + ' data-attachment2=' + doc.data().attachment2 + ' data-from=' + doc.data().from + ' data-location=' + doc.data().location + ' data-bidders=' + doc.data().bidders + ' data-cost=' + doc.data().cost + ' data-describe="' + doc.data().describe + '" data-duration="' + doc.data().duration + '" data-posted="' + date + '" data-skillexp="' + doc.data().skillexp + '" class="vote">  <div class="job-item"> <div class="row align-items-center"><div class="col-md-12 job-info"><div class="text"><h5 class="title-job"><a href="#">' + doc.data().title + ' ( RECOMMENDED TO YOU ) </a></h5><br><div class="date-job"><i class="fa fa-check-circle"></i><span class="company-name">' + doc.data().name + '</span> - Posted ' + date + '</div><div class="two-line-ellipsis" style="color: #616060; font-size: large;">' + doc.data().describe + '</div><div class="meta-job" style="color: #616060; font-size: large; padding-top: 5px; font-style: oblique; "><span class="salary" style="color: #04b418; font-weight: bold;"><i class="far fa-money-bill-alt"></i>Ksh. ' + doc.data().cost + ' Per Page</span><span class="location"><i class="far fa-map" ></i>' + doc.data().location + '</span><span class="time"><i class="far fa-clock"></i>' + doc.data().duration + '</span></div><button class="add-favourites"><i class="far fa-star"></i></button></div></div></div></div>    </td></tr>';
+
+                    // Append row to table by calling database id and appending the above new row to table
+                $('#dataTablerig > tbody:last-child').append(new_row);
+
+                $("#number").text(bidder_no + " Jobs Found");
+            } else {
+                // Same thing here
+                 var new_row =
+                    '<tr style="width:100%"><td style="width:100%" data-id=' + doc.id + ' data-subject="' + doc.data().title + '" data-name="' + doc.data().name + '" data-attachment1=' + doc.data().attachment1 + ' data-attachment2=' + doc.data().attachment2 + ' data-location=' + doc.data().location + ' data-from=' + doc.data().from + ' data-bidders=' + doc.data().bidders + ' data-cost=' + doc.data().cost + ' data-describe="' + doc.data().describe + '" data-duration="' + doc.data().duration + '" data-posted="' + date + '" data-skillexp="' + doc.data().skillexp + '" class="vote">  <div class="job-item"> <div class="row align-items-center"><div class="col-md-12 job-info"><div class="text"><h5 class="title-job"><a href="#">' + doc.data().title + '</a></h5><br><div class="date-job"><i class="fa fa-check-circle"></i><span class="company-name">' + doc.data().name + '</span> - Posted ' + date + '</div><div class="two-line-ellipsis" style="color: #616060; font-size: large;">' + doc.data().describe + '</div><div class="meta-job" style="color: #616060; font-size: large; padding-top: 5px; font-style: oblique; "><span class="salary" style="color: #04b418; font-weight: bold;"><i class="far fa-money-bill-alt"></i>Ksh. ' + doc.data().cost + ' Per Page</span><span class="location"><i class="far fa-map" ></i>' + doc.data().location + '</span><span class="time"><i class="far fa-clock"></i>' + doc.data().duration + '</span></div><button class="add-favourites"><i class="far fa-star"></i></button></div></div></div></div>    </td></tr>';
+                $('#dataTablerig > tbody:last-child').append(new_row);
+                $("#number").text(bidder_no + " Jobs Found");
+            }
+           
+            }
+        });
+        // Click functionality to save details to session that way you can use the data saved in another page. 
+        $(".vote").click(function () {
+            var subject_id = $(this).data("id");
+            var subject = $(this).data("subject");
+            var name = $(this).data("name");
+            var location = $(this).data("location");
+            var bidders = $(this).data("bidders");
+            var cost = $(this).data("cost");
+            var describe = $(this).data("describe");
+            var duration = $(this).data("duration");
+            var posted = $(this).data("posted");
+            var skillexp = $(this).data("skillexp"); var attachment2 = $(this).data("attachment2");
+            var from = $(this).data("from"); var attachment1 = $(this).data("attachment1");
+            sessionStorage.setItem("from", from);
+            sessionStorage.setItem("subject_id", subject_id);
+            sessionStorage.setItem("subject", subject);
+            sessionStorage.setItem("name", name);
+            sessionStorage.setItem("describe", describe);
+            sessionStorage.setItem("location", location);
+            sessionStorage.setItem("bidders", bidders);
+            sessionStorage.setItem("cost", cost);
+            sessionStorage.setItem("duration", duration);
+            sessionStorage.setItem("posted", posted);
+            sessionStorage.setItem("skillexp", skillexp);
+            sessionStorage.setItem("attachment1", attachment1);
+            sessionStorage.setItem("attachment2", attachment2);
+        });
+       
+    });
+});
+
+</script>
+</body>
+</html>
